@@ -22,7 +22,10 @@ async function Homepage(){
           </div>
       ))}
       </div>
+
+      <p className="text-white">David</p>
     </div>
+
   );
 
 
