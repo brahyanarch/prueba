@@ -1,28 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-generator client {
-  provider = "prisma-client-js"
-}
-
-datasource db {
-  provider = "mysql"
-  url      = env("DATABASE_URL")
-}
-
-model Note {
-  id Int @id @default(autoincrement())
-  title String 
-  content String? 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-model user {
-  id Int @id @default(autoincrement())
-  nombre String 
-  password String
-} 
 
 model Formulario {
   id       Int       @id @default(autoincrement())
@@ -134,60 +109,4 @@ model DetalleVariasOpciones {
   TipoVariasOpciones TipoVariasOpciones @relation(fields: [nompreg_vp, nomform_vp, contenido_vp], references: [nompreg_vo, nomform_vo, contenido_vo])
 
   @@id([nompreg_vp, nomform_vp, contenido_vp, contenidodvp])
-}
-// schema.prisma
-
-model Rol {
-  id_rol      Int      @id @default(autoincrement())
-  n_rol       String
-  abreviatura String?
-  
-  // Relaciones inversas
-  datellePermisos DetallePermiso[]
-  usuarios        Usuario[]
-}
-
-model Permiso {
-  id_per      Int      @id @default(autoincrement())
-  n_per       String
-  abreviatura String?
-  
-  // Relaciones inversas
-  datellePermisos DetallePermiso[]
-}
-
-model DetallePermiso {
-  id_dpe     Int    @id @default(autoincrement())
-  id_rol     Int
-  id_per     Int
-  estado     Boolean
-
-  // Relaciones
-  permisos Permiso @relation(fields: [id_per], references: [id_per])
-  roles    Rol     @relation(fields: [id_rol], references: [id_rol])
-}
-
-model Usuario {
-  dni                 String  @db.Char(8)
-  n_usu               String
-  estado              Boolean @default(true)
-  password            String
-  rol_id              Int
-  subunidad_id_subuni Int
-
-  // Llave primaria compuesta
-  @@id([dni, rol_id, subunidad_id_subuni])
-
-  // Relaciones
-  rol     Rol       @relation(fields: [rol_id], references: [id_rol])
-  sub_uni Subunidad @relation(fields: [subunidad_id_subuni], references: [id_subuni])
-}
-
-model Subunidad {
-  id_subuni  Int     @id @default(autoincrement())
-  n_subuni   String
-  abreviatura String
-
-  // Relaciones inversas
-  usuarios Usuario[]
 }

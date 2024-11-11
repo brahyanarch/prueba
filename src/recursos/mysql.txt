@@ -1,0 +1,112 @@
+CREATE TABLE detallecasillas (
+    contenidodcas             VARCHAR(50) NOT NULL,
+    tipocasillas_contenido     INT NOT NULL,
+    nompreg_tc                VARCHAR(50) NOT NULL,  -- Nombre acortado
+    nomform_tc                VARCHAR(50) NOT NULL,  -- Nombre acortado
+    estado                    CHAR(1),
+    PRIMARY KEY (tipocasillas_contenido, nompreg_tc, nomform_tc, contenidodcas)
+);
+
+CREATE TABLE detalletdes (
+    contenidotdes        VARCHAR(50) NOT NULL,
+    nompreg_td           VARCHAR(50) NOT NULL,  -- Nombre acortado
+    contenido_td         VARCHAR(50) NOT NULL,  -- Nombre acortado
+    nomform_td           VARCHAR(50) NOT NULL,  -- Nombre acortado
+    estado               CHAR(1),
+    PRIMARY KEY (nompreg_td, contenido_td, nomform_td, contenidotdes)
+);
+
+CREATE TABLE detallevarpre (
+    contenidodvp          VARCHAR(50) NOT NULL,
+    nompreg_vp            VARCHAR(50) NOT NULL,  -- Nombre acortado
+    nomform_vp            VARCHAR(50) NOT NULL,  -- Nombre acortado
+    contenido_vp          INT NOT NULL,  -- Nombre acortado
+    estado                CHAR(1),
+    PRIMARY KEY (nompreg_vp, nomform_vp, contenido_vp, contenidodvp)
+);
+
+CREATE TABLE formulario (
+    id       INT AUTO_INCREMENT,
+    nomform  VARCHAR(50) NOT NULL,
+    estado   CHAR(1),
+    abr      VARCHAR(20),
+    PRIMARY KEY (id),
+    UNIQUE (nomform)  -- Hacemos que nomform sea único
+);
+
+CREATE TABLE preguntas (
+    nomform_preg          VARCHAR(50) NOT NULL,  -- Nombre acortado
+    nompreg               VARCHAR(50) NOT NULL,
+    PRIMARY KEY (nompreg, nomform_preg)
+);
+
+CREATE TABLE tipoarchivo (
+    nompreg_ta            VARCHAR(50) NOT NULL,  -- Nombre acortado
+    contenido_ta          VARCHAR(50) NOT NULL,  -- Nombre acortado
+    nomform_ta            VARCHAR(50) NOT NULL,  -- Nombre acortado
+    PRIMARY KEY (nompreg_ta, contenido_ta, nomform_ta),
+    CONSTRAINT fk_tipoarchivo_preg FOREIGN KEY (nompreg_ta, nomform_ta) 
+        REFERENCES preguntas (nompreg, nomform_preg)
+);
+
+CREATE TABLE tipocasillas (
+    nompreg_tc            VARCHAR(50) NOT NULL,  -- Nombre acortado
+    contenido_tc          INT NOT NULL,  -- Nombre acortado
+    nomform_tc            VARCHAR(50) NOT NULL,  -- Nombre acortado
+    PRIMARY KEY (contenido_tc, nompreg_tc, nomform_tc),
+    CONSTRAINT fk_tipocasillas_preg FOREIGN KEY (nompreg_tc, nomform_tc) 
+        REFERENCES preguntas (nompreg, nomform_preg)
+);
+
+CREATE TABLE tipodesplegable (
+    nompreg_td            VARCHAR(50) NOT NULL,  -- Nombre acortado
+    contenido_td          VARCHAR(50) NOT NULL,  -- Nombre acortado
+    nomform_td            VARCHAR(50) NOT NULL,  -- Nombre acortado
+    PRIMARY KEY (nompreg_td, contenido_td, nomform_td),
+    CONSTRAINT fk_tipodesplegable_preg FOREIGN KEY (nompreg_td, nomform_td) 
+        REFERENCES preguntas (nompreg, nomform_preg)
+);
+
+CREATE TABLE tipofecha (
+    nompreg_tf            VARCHAR(50) NOT NULL,  -- Nombre acortado
+    contenido_tf          DATE NOT NULL,  -- Nombre acortado
+    nomform_tf            VARCHAR(50) NOT NULL,  -- Nombre acortado
+    PRIMARY KEY (nompreg_tf, contenido_tf, nomform_tf),
+    CONSTRAINT fk_tipofecha_preg FOREIGN KEY (nompreg_tf, nomform_tf) 
+        REFERENCES preguntas (nompreg, nomform_preg)
+);
+
+CREATE TABLE tipoparrafo (
+    nompreg_tp            VARCHAR(50) NOT NULL,  -- Nombre acortado
+    contenido_tp          VARCHAR(50),  -- Nombre acortado
+    nomform_tp            VARCHAR(50) NOT NULL,  -- Nombre acortado
+    PRIMARY KEY (nomform_tp),
+    CONSTRAINT fk_tipoparrafo_preg FOREIGN KEY (nompreg_tp, nomform_tp) 
+        REFERENCES preguntas (nompreg, nomform_preg)
+);
+
+CREATE TABLE tipovariasopciones (
+    nompreg_vo            VARCHAR(50) NOT NULL,  -- Nombre acortado
+    contenido_vo          INT NOT NULL,  -- Nombre acortado
+    nomform_vo            VARCHAR(50) NOT NULL,  -- Nombre acortado
+    PRIMARY KEY (nompreg_vo, nomform_vo, contenido_vo),
+    CONSTRAINT fk_tipovariasopciones_preg FOREIGN KEY (nompreg_vo, nomform_vo) 
+        REFERENCES preguntas (nompreg, nomform_preg)
+);
+
+-- Claves foráneas corregidas
+ALTER TABLE detallecasillas
+    ADD CONSTRAINT fk_detallecasillas_tipocasillas FOREIGN KEY (tipocasillas_contenido, nompreg_tc, nomform_tc)
+        REFERENCES tipocasillas (contenido_tc, nompreg_tc, nomform_tc);
+
+ALTER TABLE detalletdes
+    ADD CONSTRAINT fk_detalletdes_tipodesplegable FOREIGN KEY (nompreg_td, contenido_td, nomform_td)
+        REFERENCES tipodesplegable (nompreg_td, contenido_td, nomform_td);
+
+ALTER TABLE detallevarpre
+    ADD CONSTRAINT fk_detallevarpre_tipovariasopciones FOREIGN KEY (nompreg_vp, nomform_vp, contenido_vp)
+        REFERENCES tipovariasopciones (nompreg_vo, nomform_vo, contenido_vo);
+
+ALTER TABLE preguntas
+    ADD CONSTRAINT fk_preguntas_formulario FOREIGN KEY (nomform_preg)
+        REFERENCES formulario (nomform);

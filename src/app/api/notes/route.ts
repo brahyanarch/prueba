@@ -5,8 +5,11 @@ export async function GET() {
   try {
     //throw new Error('Something wrong');
     const notes = await prisma.note.findMany();
-    console.log(notes);
     
+  console.log("get notas");
+    console.log(notes);
+  console.log("get notas");
+
     return NextResponse.json(notes);
   } catch (error) {
     if (error instanceof Error) {
