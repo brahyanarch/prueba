@@ -1,67 +1,30 @@
-"use client"
-import React, { useState } from 'react';
+import ProductTable from '@/components/ProductTable';
+import { fetchProducts } from '@/app/actions';
 
-const Login = () => {
-  const [usuario, setUsuario] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState(null);
+export default async function ProductListPage({
+  searchParams,
+}: {
+  searchParams: { [key: string]: string | string[] | undefined }
+}) {
+  const page = Number(searchParams.page) || 1;
+  const search = typeof searchParams.search === 'string' ? searchParams.search : '';
+  const sort = typeof searchParams.sort === 'string' ? searchParams.sort : 'name';
+  const order = typeof searchParams.order === 'string' ? searchParams.order : 'asc';
 
-  const handleSubmit = async (e:any) => {
-    e.preventDefault();
-    setError(null); // Limpiar errores previos
-    console.log()
-    try {
-      const response = await fetch('http://localhost:3000/api/roles', {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        } // Enviar el usuario y la contraseña
-      }); 
-
-      const data = await response.json();
-      console.log(data);
-      if (response.ok) {
-        // Si el inicio de sesión es exitoso, guarda el token en localStorage
-        localStorage.setItem('token', data.token);
-        console.log('Inicio de sesión exitoso');
-      } else {
-        // Manejar errores de respuesta
-        setError(data.error || 'Error al iniciar sesión');
-      }
-    } catch (error) {
-      console.log('Error al conectarse con el servidor');
-    }
-  };
+  const { products, totalPages } = await fetchProducts({ page, search, sort, order });
 
   return (
-    <div>
-      <h2>Iniciar Sesión</h2>
-      <form onSubmit={handleSubmit}>
-        <label>
-          Usuario:
-          <input
-            type="text"
-            value={usuario}
-            onChange={(e) => setUsuario(e.target.value)}
-            required
-          />
-        </label>
-        <br />
-        <label>
-          Contraseña:
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-        </label>
-        <br />
-        <button type="submit">Iniciar Sesión</button>
-      </form>
-      {error && <p style={{ color: 'red' }}>{error}</p>}
+    <div className="container mx-auto p-4">
+      <h1 className="text-2xl font-bold mb-4">Lista de Productos</h1>
+      <ProductTable 
+        products={products} 
+        totalPages={totalPages}
+        currentPage={page}
+        search={search}
+        sort={sort}
+        order={order}
+      />
     </div>
   );
-};
+}
 
-export default Login;

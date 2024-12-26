@@ -1,8 +1,15 @@
-'use client';
+"use client";
 import { Button } from "@/components/ui/button";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { X, Edit, Trash2, CirclePlus } from "lucide-react";
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from "react";
 import { API_SUBUNIDADES } from "@/config/apiconfig";
 import { Skeleton } from "@/components/ui/skeleton";
 // import BreadcrumbItems from "@/components/breadcrumb";
@@ -10,25 +17,164 @@ type Permission = {
   id_subuni: number;
   n_subuni: string;
 };
+
+function renderPaginationButtons(
+  currentPage: number,
+  totalPages: number,
+  onPageChange: (page: number) => void
+) {
+  const pageButtons = [];
+
+  if (totalPages <= 5) {
+    // Mostrar todas las páginas si son 5 o menos
+    for (let i = 1; i <= totalPages; i++) {
+      pageButtons.push(
+        <Button
+          key={i}
+          variant="outline"
+          size="sm"
+          onClick={() => onPageChange(i)}
+          className={currentPage === i ? "bg-blue-500 text-white" : ""}
+        >
+          {i}
+        </Button>
+      );
+    }
+  } else {
+    // Mostrar paginación dinámica con "..."
+    if (currentPage <= 3) {
+      // Mostrar las primeras 3 páginas y "..."
+      for (let i = 1; i <= 3; i++) {
+        pageButtons.push(
+          <Button
+            key={i}
+            variant="outline"
+            size="sm"
+            onClick={() => onPageChange(i)}
+            className={currentPage === i ? "bg-blue-500 text-white" : ""}
+          >
+            {i}
+          </Button>
+        );
+      }
+      pageButtons.push(
+        <span key="start-ellipsis" className="px-2">
+          ...
+        </span>
+      );
+      pageButtons.push(
+        <Button
+          key={totalPages}
+          variant="outline"
+          size="sm"
+          onClick={() => onPageChange(totalPages)}
+        >
+          {totalPages}
+        </Button>
+      );
+    } else if (currentPage > 3 && currentPage < totalPages - 2) {
+      // Mostrar páginas con "..." en ambos extremos
+      pageButtons.push(
+        <Button
+          key={1}
+          variant="outline"
+          size="sm"
+          onClick={() => onPageChange(1)}
+        >
+          1
+        </Button>
+      );
+      pageButtons.push(
+        <span key="middle-ellipsis-left" className="px-2">
+          ...
+        </span>
+      );
+
+      for (let i = currentPage - 1; i <= currentPage + 1; i++) {
+        pageButtons.push(
+          <Button
+            key={i}
+            variant="outline"
+            size="sm"
+            onClick={() => onPageChange(i)}
+            className={currentPage === i ? "bg-blue-500 text-white" : ""}
+          >
+            {i}
+          </Button>
+        );
+      }
+
+      pageButtons.push(
+        <span key="middle-ellipsis-right" className="px-2">
+          ...
+        </span>
+      );
+      pageButtons.push(
+        <Button
+          key={totalPages}
+          variant="outline"
+          size="sm"
+          onClick={() => onPageChange(totalPages)}
+        >
+          {totalPages}
+        </Button>
+      );
+    } else {
+      // Mostrar las últimas 3 páginas y "..."
+      pageButtons.push(
+        <Button
+          key={1}
+          variant="outline"
+          size="sm"
+          onClick={() => onPageChange(1)}
+        >
+          1
+        </Button>
+      );
+      pageButtons.push(
+        <span key="end-ellipsis" className="px-2">
+          ...
+        </span>
+      );
+
+      for (let i = totalPages - 2; i <= totalPages; i++) {
+        pageButtons.push(
+          <Button
+            key={i}
+            variant="outline"
+            size="sm"
+            onClick={() => onPageChange(i)}
+            className={currentPage === i ? "bg-blue-500 text-white" : ""}
+          >
+            {i}
+          </Button>
+        );
+      }
+    }
+  }
+
+  return pageButtons;
+}
+
 // Modal para agregar un nuevo Permiso
 export const EditModal = ({ isOpen, closeModal, onAddPermission }: any) => {
-  const [name, setName] = useState('');
-  const [abbreviation, setAbbreviation] = useState('');
+  const [name, setName] = useState("");
+  const [abbreviation, setAbbreviation] = useState("");
 
   const handleSubmit = async (e: any) => {
     e.preventDefault();
     const newPer = {
       nombre: name,
-      abreviatura: abbreviation
+      abreviatura: abbreviation,
     };
 
     try {
       const response = await fetch(API_SUBUNIDADES, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json'
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify(newPer)
+        body: JSON.stringify(newPer),
       });
 
       if (response.ok) {
@@ -36,10 +182,10 @@ export const EditModal = ({ isOpen, closeModal, onAddPermission }: any) => {
         onAddPermission(addedPermission);
         closeModal();
       } else {
-        console.error('Error al agregar el permiso');
+        console.error("Error al agregar el permiso");
       }
     } catch (error) {
-      console.error('Error al conectar con la API:', error);
+      console.error("Error al conectar con la API:", error);
     }
   };
 
@@ -58,7 +204,10 @@ export const EditModal = ({ isOpen, closeModal, onAddPermission }: any) => {
         <h2 className="text-2xl font-bold mb-4 text-white">Agregar Permiso</h2>
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
-            <label htmlFor="name" className="block text-sm font-medium text-gray-300 mb-1">
+            <label
+              htmlFor="name"
+              className="block text-sm font-medium text-gray-300 mb-1"
+            >
               Nombre
             </label>
             <input
@@ -71,7 +220,10 @@ export const EditModal = ({ isOpen, closeModal, onAddPermission }: any) => {
             />
           </div>
           <div className="mb-8">
-            <label htmlFor="abbreviation" className="block text-sm font-medium text-gray-300 mb-1">
+            <label
+              htmlFor="abbreviation"
+              className="block text-sm font-medium text-gray-300 mb-1"
+            >
               Abreviatura
             </label>
             <input
@@ -104,9 +256,7 @@ export const EditModal = ({ isOpen, closeModal, onAddPermission }: any) => {
   );
 };
 
-
-
-export default function Component() {  
+export default function Component() {
   const [Permisos, setPermisos] = useState<Permission[]>([]); // Define el tipo de Permisos
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -119,7 +269,7 @@ export default function Component() {
       try {
         const response = await fetch(API_SUBUNIDADES);
         if (!response.ok) {
-          throw new Error('Error al obtener los Permisos');
+          throw new Error("Error al obtener los Permisos");
         }
         const data = await response.json();
         setPermisos(data);
@@ -144,17 +294,19 @@ export default function Component() {
   const deletePermission = async (id: number) => {
     try {
       const response = await fetch(`${API_SUBUNIDADES}/${id}`, {
-        method: 'DELETE',
+        method: "DELETE",
       });
 
       if (response.ok) {
-        setPermisos((prevPermisos) => prevPermisos.filter((permiso) => permiso.id_subuni !== id));
-        console.log('Permiso eliminado correctamente');
+        setPermisos((prevPermisos) =>
+          prevPermisos.filter((permiso) => permiso.id_subuni !== id)
+        );
+        console.log("Permiso eliminado correctamente");
       } else {
-        console.error('Error al eliminar el permiso');
+        console.error("Error al eliminar el permiso");
       }
     } catch (error) {
-      console.error('Error al conectar con la API:', error);
+      console.error("Error al conectar con la API:", error);
     }
   };
 
@@ -178,7 +330,9 @@ export default function Component() {
 
   return (
     <div className="w-[90%] m-4 p-4 space-y-4 text-white min-h-screen">
-      <h1 className="text-2xl font-bold text-black dark:text-white">Sub Unidad</h1>
+      <h1 className="text-2xl font-bold text-black dark:text-white">
+        Sub Unidad
+      </h1>
       <Button variant="secondary" size="sm" onClick={toggleModal}>
         <CirclePlus className="h-4 w-4" />
         Nuevo
@@ -202,7 +356,11 @@ export default function Component() {
                     <Button variant="ghost" size="icon">
                       <Edit className="h-4 w-4" />
                     </Button>
-                    <Button variant="ghost" size="icon" onClick={() => deletePermission(permission.id_subuni)}>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => deletePermission(permission.id_subuni)}
+                    >
                       <Trash2 className="h-4 w-4" />
                     </Button>
                   </div>
@@ -213,21 +371,33 @@ export default function Component() {
         </Table>
       </div>
       <div className="flex justify-center items-center space-x-2">
-        <Button variant="outline" size="sm" onClick={() => paginate(currentPage - 1)} disabled={currentPage === 1}>Anterior</Button>
-        {[...Array(Math.ceil(Permisos.length / itemsPerPage)).keys()].map(page => (
-          <Button
-            key={page}
-            variant="outline"
-            size="sm"
-            onClick={() => paginate(page + 1)}
-            className={currentPage === page + 1 ? 'bg-blue-500 text-white' : ''}
-          >
-            {page + 1}
-          </Button>
-        ))}
-        <Button variant="outline" size="sm" onClick={() => paginate(currentPage + 1)} disabled={currentPage === Math.ceil(Permisos.length / itemsPerPage)}>Siguiente</Button>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => paginate(currentPage - 1)}
+          disabled={currentPage === 1}
+        >
+          Anterior
+        </Button>
+        {renderPaginationButtons(
+          currentPage,
+          Math.ceil(Permisos.length / itemsPerPage),
+          paginate
+        )}
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => paginate(currentPage + 1)}
+          disabled={currentPage === Math.ceil(Permisos.length / itemsPerPage)}
+        >
+          Siguiente
+        </Button>
       </div>
-      <EditModal isOpen={isModalOpen} closeModal={toggleModal} onAddPermission={addPermission} />
+      <EditModal
+        isOpen={isModalOpen}
+        closeModal={toggleModal}
+        onAddPermission={addPermission}
+      />
     </div>
   );
 }

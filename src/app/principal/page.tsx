@@ -86,7 +86,8 @@ export default function Component() {
                 <input type="checkbox" id="remember" className="rounded border-gray-300 text-primary focus:ring-primary" />
                 <Label htmlFor="remember" className="text-sm">Recordar contraseña</Label>
               </div>
-              <Button className="w-full" type="submit">Iniciar Sesión</Button>
+                <Label className='text-blue-600' htmlFor="password">¿Olvidaste tu contraseña?</Label>
+              <Button className="w-full bg-blue-600" type="submit" >Iniciar Sesión</Button>
             </form>
             <div className="mt-4 text-center">
               <a href="#" className="text-sm text-primary hover:underline">Registrarse</a>
